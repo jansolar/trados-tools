@@ -1,5 +1,10 @@
 #!/usr/bin/perl
 
+
+#<source><g id="7">PESTICIDE EMULSION CONCENTRATES CONTAINING PETROLEUM DERIVED OILS AND METHODS OF USE</g></source>
+#<seg-source><g id="7"><mrk mtype="seg" mid="1">PESTICIDE EMULSION CONCENTRATES CONTAINING PETROLEUM DERIVED OILS AND METHODS OF USE</mrk></g></seg-source>
+#<target><g id="7"><mrk mtype="seg" mid="1">EMULZNÍ KONCENTRÁTY PESTICIDŮ OBSAHUJÍCÍ  ROPNÉ OLEJE A ZPŮSOBY POUŽITÍ</mrk></g></target>
+
 # Modules used
 use strict;
 use warnings;
@@ -23,53 +28,72 @@ my @targetFileLines=<FHT>;
 close(FHT);
 
 my $lineCounter=0;
-my $tokenCounter=0;
-#while (<FILE>) {
-#while ($tradosSourceXML) {
-
-foreach $targetLine (@targetFileLines) {
-    #<source><g id="7">PESTICIDE EMULSION CONCENTRATES CONTAINING PETROLEUM DERIVED OILS AND METHODS OF USE</g></source>
-    #<seg-source><g id="7"><mrk mtype="seg" mid="1">PESTICIDE EMULSION CONCENTRATES CONTAINING PETROLEUM DERIVED OILS AND METHODS OF USE</mrk></g></seg-source>
-    #<target><g id="7"><mrk mtype="seg" mid="1">EMULZNÍ KONCENTRÁTY PESTICIDŮ OBSAHUJÍCÍ  ROPNÉ OLEJE A ZPŮSOBY POUŽITÍ</mrk></g></target>
 
 
-    my $sourceLine = shift(@sourceFileLines);
 
-    $lineCounter++;
 
-    chomp $targetLine;
-    chomp $sourceLine;
+my $tradosSourceXMLNew = $tradosSourceXML;
+while($tradosSourceXML =~ /<target>(.*?)<\/target>/g) {
+    my $targetStringOrig = "<target>" . $1 . "</target>";
+    my $targetString = $targetStringOrig;
+    while ($targetString =~ /<mrk mtype="seg" mid="(\w+)">(.*?)<\/mrk>/g) {
+        my $patternID = $1;
+        my $patternText = $2;
 
-    my $targetID;
-    my $targetText;
-    my $sourceID;
-    my $sourceText;
+        my $targetLine = shift(@targetFileLines);
+        my $sourceLine = shift(@sourceFileLines);
 
-    if ($targetLine =~ /^XID=(\w+):(.*)$/g) {
-        my $targetID = $1;
-        my $targetText = $2;
+        chomp $targetLine;
+        chomp $sourceLine;
+
+        my $targetID;
+        my $targetText;
+        my $sourceID;
+        my $sourceText;
+
+        if ($targetLine =~ /^XID=(\w+):(.*)$/g) {
+            $targetID = $1;
+            $targetText = $2;
+        }
+        else {
+            die "CAN NOT PARSE TARGET LINE: $targetLine\n";
+        }
+
+        if ($sourceLine =~ /^XID=(\w+):(.*)$/g) {
+            $sourceID = $1;
+            $sourceText = $2;
+        }
+        else {
+            die "CAN NOT PARSE SOURCE LINE: $sourceLine\n";
+        }
+
+        die "Source vs Target file ID mismatch!!!\n" if ($sourceID != $targetID);
+        die "Pattern vs Target file ID mismatch!!!\n" if ($patternID != $targetID);
+        die "Pattern vs Source file text mismatch!!!\n" if ($patternText ne $sourceText);
+
+        print "--------------------------------------------------------------------------------\n";
+        print "XID=$targetID    line=$lineCounter\n";
+        print "SOURCE=$sourceText\n";
+        print "TARGET=$targetText\n";
+
+        my $searchPattern='<mrk mtype="seg" mid="' . $patternID . '">' . $patternText . '</mrk>';
+        my $replacePattern='<mrk mtype="seg" mid="' . $patternID . '">' . $targetText . '</mrk>';
+
+        print "SOURCE PATTERN=$searchPattern\n";
+        print "TARGET PATTERN=$replacePattern\n";
+
+        $targetString =~ s/$searchPattern/$replacePattern/g;
+
     }
-    else {
-        print "CAN NOT PARSE TARGET LINE: $targetLine\n";
-        next;
-    }
-
-    if ($sourceLine =~ /^XID=(\w+):(.*)$/g) {
-        my $sourceID = $1;
-        my $sourceText = $2;
-    }
-    else {
-        print "CAN NOT PARSE SOURCE LINE: $sourceLine\n";
-        next;
-    }
-
-    die "Source vs Target file mismatch!!!\n" if ($sourceID != $targetID);
-
-    print "--------------------------------------------------------------------------------\n";
-    print "XID=$targetID    line=$lineCounter\n";
-    print "SOURCE=$sourceText\n";
-    print "TARGET=$targetText\n";
+    $tradosSourceXML =~ s/$targetStringOrig/$targetString/g;
 }
+
+open(FHT, '>', $targetTradosFile) or die $!;
+print FHT $tradosSourceXML;
+close(FHT);
+
+
+
 
 
 
