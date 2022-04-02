@@ -43,6 +43,7 @@ foreach (@tradosSourceXML) {
             my $printSrting = "XID=" . $1 . ":" . $2 . "\n";
             print $printSrting;
             print FHS $printSrting;
+            #my $printSrting = "XID=" . $1 . ":PRELOZENO: " . $2 . "\n";
             print FHT $printSrting;
         }
     }

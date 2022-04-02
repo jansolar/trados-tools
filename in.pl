@@ -36,6 +36,7 @@ my $tradosSourceXMLNew = $tradosSourceXML;
 while($tradosSourceXML =~ /<target>(.*?)<\/target>/g) {
     my $targetStringOrig = "<target>" . $1 . "</target>";
     my $targetString = $targetStringOrig;
+    my $newTargetString = $targetStringOrig;
     while ($targetString =~ /<mrk mtype="seg" mid="(\w+)">(.*?)<\/mrk>/g) {
         my $patternID = $1;
         my $patternText = $2;
@@ -82,14 +83,14 @@ while($tradosSourceXML =~ /<target>(.*?)<\/target>/g) {
         print "SOURCE PATTERN=$searchPattern\n";
         print "TARGET PATTERN=$replacePattern\n";
 
-        $targetString =~ s/$searchPattern/$replacePattern/g;
+        $newTargetString =~ s/\Q$searchPattern\E/$replacePattern/g;
 
     }
-    $tradosSourceXML =~ s/$targetStringOrig/$targetString/g;
+    $tradosSourceXMLNew =~ s/\Q$targetStringOrig\E/$newTargetString/g;
 }
 
 open(FHT, '>', $targetTradosFile) or die $!;
-print FHT $tradosSourceXML;
+print FHT $tradosSourceXMLNew;
 close(FHT);
 
 
