@@ -22,11 +22,25 @@ foreach (@tradosSourceXML) {
 #<seg-source><g id="7"><mrk mtype="seg" mid="1">PESTICIDE EMULSION CONCENTRATES CONTAINING PETROLEUM DERIVED OILS AND METHODS OF USE</mrk></g></seg-source>
 #<target><g id="7"><mrk mtype="seg" mid="1">EMULZNÍ KONCENTRÁTY PESTICIDŮ OBSAHUJÍCÍ  ROPNÉ OLEJE A ZPŮSOBY POUŽITÍ</mrk></g></target>
 
-    while($_ =~ /<source>(<g id="\w+">)+(.*?)(<\/g>)+<\/source>(.*?)<target>(<g id="\w+">)+<mrk mtype="seg" mid="(\w+)">(.*?)<\/mrk>(<\/g>)+<\/target>/g) {
+#    while($_ =~ /<source>(<g id="\w+">)+(.*?)(<\/g>)+<\/source>(.*?)<target>(<g id="\w+">)+<mrk mtype="seg" mid="(\w+)">(.*?)<\/mrk>(<\/g>)+<\/target>/g) {
+#            $tokenCounter++;
+#            print "SOURCE ($tokenCounter): id=$6: $2\n";
+#            print "TARGET ($tokenCounter): id=$6: $7\n";
+#    }
+
+    while($_ =~ /<target>(.*?)<\/target>/g) {
+        my $targetString=$1;
+        #print "--------------------------------------------------------------------------------\n";
+        #print "TARGET STRING: $targetString\n";
+        while ($targetString =~ /<mrk mtype="seg" mid="(\w+)">(.*?)<\/mrk>/g) {
             $tokenCounter++;
-            print "SOURCE ($tokenCounter): id=$6: $2\n";
-            print "TARGET ($tokenCounter): id=$6: $7\n";
+            #print "--------------------------------------------------------------------------------\n";
+            #print "S:id=$1: $2\n";
+            #print "---\n";
+            print "T: id=$1: $2\n";
+        }
     }
+
     $lineCounter++;
 }
 print "Processed lines: $lineCounter\n";
