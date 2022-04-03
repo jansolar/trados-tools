@@ -11,6 +11,7 @@ use warnings;
 
 my $sourceTradosFile=shift;
 my $targetTradosFile=$sourceTradosFile . ".NEW";
+#my $targetTradosFile="ENCSb_EP3065543 B1 word file_FullSpec_ExcAbsRTEHL_NoPM.docx.sdlxliff";
 my $sourceFile="trados-source.txt";
 my $targetFile="trados-target.txt";
 
@@ -83,7 +84,10 @@ while($tradosSourceXML =~ /<target>(.*?)<\/target>/g) {
         print "SOURCE PATTERN=$searchPattern\n";
         print "TARGET PATTERN=$replacePattern\n";
 
-        $newTargetString =~ s/\Q$searchPattern\E/$replacePattern/g;
+        #Ignore strings with tags!
+        $newTargetString =~ s/\Q$searchPattern\E/$replacePattern/g unless $sourceText =~ /</;
+
+        #$newTargetString =~ s/\Q$searchPattern\E/$replacePattern/g;
 
     }
     $tradosSourceXMLNew =~ s/\Q$targetStringOrig\E/$newTargetString/g;
