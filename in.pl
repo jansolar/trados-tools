@@ -15,10 +15,18 @@ my $targetTradosFile=$sourceTradosFile . ".NEW";
 my $sourceFile="trados-source.txt";
 my $targetFile="trados-target.txt";
 
-open (FILE, "<$sourceTradosFile");
-my $tradosSourceXML=<FILE>;
+open (FILE, $sourceTradosFile);
+my @tradosSourceXMLLines=<FILE>;
 #chomp $LastAD;
 close(FILE);
+
+my $tradosSourceXML;
+
+
+
+
+
+
 
 open(FHS, $sourceFile) or die $!;
 my @sourceFileLines=<FHS>;
@@ -30,72 +38,92 @@ close(FHT);
 
 my $lineCounter=0;
 
+my $BREAKPOINT=20000;
+my $lineNumber=0;
 
 
-
-my $tradosSourceXMLNew = $tradosSourceXML;
-while($tradosSourceXML =~ /<target>(.*?)<\/target>/g) {
-    my $targetStringOrig = "<target>" . $1 . "</target>";
-    my $targetString = $targetStringOrig;
-    my $newTargetString = $targetStringOrig;
-    while ($targetString =~ /<mrk mtype="seg" mid="(\w+)">(.*?)<\/mrk>/g) {
-        my $patternID = $1;
-        my $patternText = $2;
-
-        my $targetLine = shift(@targetFileLines);
-        my $sourceLine = shift(@sourceFileLines);
-
-        chomp $targetLine;
-        chomp $sourceLine;
-
-        my $targetID;
-        my $targetText;
-        my $sourceID;
-        my $sourceText;
-
-        if ($targetLine =~ /^XID=(\w+):(.*)$/g) {
-            $targetID = $1;
-            $targetText = $2;
-        }
-        else {
-            die "CAN NOT PARSE TARGET LINE: $targetLine\n";
-        }
-
-        if ($sourceLine =~ /^XID=(\w+):(.*)$/g) {
-            $sourceID = $1;
-            $sourceText = $2;
-        }
-        else {
-            die "CAN NOT PARSE SOURCE LINE: $sourceLine\n";
-        }
-
-        die "Source vs Target file ID mismatch!!!\n" if ($sourceID != $targetID);
-        die "Pattern vs Target file ID mismatch!!!\n" if ($patternID != $targetID);
-        die "Pattern vs Source file text mismatch!!!\n" if ($patternText ne $sourceText);
-
-        print "--------------------------------------------------------------------------------\n";
-        print "XID=$targetID    line=$lineCounter\n";
-        print "SOURCE=$sourceText\n";
-        print "TARGET=$targetText\n";
-
-        my $searchPattern='<mrk mtype="seg" mid="' . $patternID . '">' . $patternText . '</mrk>';
-        my $replacePattern='<mrk mtype="seg" mid="' . $patternID . '">' . $targetText . '</mrk>';
-
-        print "SOURCE PATTERN=$searchPattern\n";
-        print "TARGET PATTERN=$replacePattern\n";
-
-        #Ignore strings with tags!
-        $newTargetString =~ s/\Q$searchPattern\E/$replacePattern/g unless $sourceText =~ /</;
-
-        #$newTargetString =~ s/\Q$searchPattern\E/$replacePattern/g;
-
-    }
-    $tradosSourceXMLNew =~ s/\Q$targetStringOrig\E/$newTargetString/g;
-}
+my $tradosSourceXMLNew;
 
 open(FHT, '>', $targetTradosFile) or die $!;
-print FHT $tradosSourceXMLNew;
+
+foreach $tradosSourceXML (@tradosSourceXMLLines) {
+    $lineNumber++;
+    $tradosSourceXMLNew = $tradosSourceXML;
+
+    print "Running...\n";
+    print "$tradosSourceXML\n";
+
+    while ($tradosSourceXML =~ /<target>(.*?)<\/target>/g) {
+        print "In Target...\n";
+        my $targetStringOrig = "<target>" . $1 . "</target>";
+        my $targetString = $targetStringOrig;
+        my $newTargetString = $targetStringOrig;
+        while ($targetString =~ /<mrk mtype="seg" mid="(\w+)">(.*?)<\/mrk>/g) {
+            my $patternID = $1;
+            my $patternText = $2;
+
+            my $targetLine = shift(@targetFileLines);
+            my $sourceLine = shift(@sourceFileLines);
+
+            chomp $targetLine;
+            chomp $sourceLine;
+
+            my $targetID;
+            my $targetText;
+            my $sourceID;
+            my $sourceText;
+
+            if ($targetLine =~ /^XID=(\w+):(.*)$/g) {
+                $targetID = $1;
+                $targetText = $2;
+            }
+            else {
+                die "CAN NOT PARSE TARGET LINE: $targetLine\n";
+            }
+
+            if ($sourceLine =~ /^XID=(\w+):(.*)$/g) {
+                $sourceID = $1;
+                $sourceText = $2;
+            }
+            else {
+                die "CAN NOT PARSE SOURCE LINE: $sourceLine\n";
+            }
+
+            die "Source vs Target file ID mismatch!!!\n" if ($sourceID != $targetID);
+            die "Pattern vs Target file ID mismatch!!!\n" if ($patternID != $targetID);
+            die "Pattern vs Source file text mismatch!!!\n" if ($patternText ne $sourceText);
+
+            print "--------------------------------------------------------------------------------\n";
+            print "XID=$targetID    line=$lineNumber\n";
+            print "SOURCE=$sourceText\n";
+            print "TARGET=$targetText\n";
+
+            my $searchPattern = '<mrk mtype="seg" mid="' . $patternID . '">' . $patternText . '</mrk>';
+            my $replacePattern = '<mrk mtype="seg" mid="' . $patternID . '">' . $targetText . '</mrk>';
+
+            print "SOURCE PATTERN=$searchPattern\n";
+            print "TARGET PATTERN=$replacePattern\n";
+
+            #Ignore strings with tags!
+
+            #$lineNumber++;
+            if ($lineNumber > $BREAKPOINT) {
+                print "Skipping line $lineNumber (BREAKPOINT)\n";
+            } else {
+                #$newTargetString =~ s/\Q$searchPattern\E/$replacePattern/g unless $sourceText =~ /</;
+                $newTargetString =~ s/\Q$searchPattern\E/$replacePattern/g;
+            }
+
+            #$newTargetString =~ s/\Q$searchPattern\E/$replacePattern/g;
+
+        }
+        $tradosSourceXMLNew =~ s/\Q$targetStringOrig\E/$newTargetString/g;
+    }
+
+    print FHT $tradosSourceXMLNew;
+}
 close(FHT);
+print "Done!\n"
 
 
 
