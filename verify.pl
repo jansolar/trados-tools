@@ -19,6 +19,9 @@ foreach (@targetText) {
     if ($_ =~ /\& (\w+);/g) {
         print "Error: >>& $1;<< in: $_";
     }
+    if ($_ =~ /\&\&/g) {
+        print "Warning: Double & in: $_";
+    }
 }
 
 foreach my $targetTextLine (@targetText) {
