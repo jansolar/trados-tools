@@ -1,13 +1,16 @@
 1. If there are NO already translated texts:
 2. in TRADOS : copy all source to target + save.
 3. copy the sdlxliff file to the trados-tools directory as "trados.sdlxliff"
-4. execute perl ex.pl trados.sdlxliff
-5. ... files trados-source and trados-target.txt will be created
-6. create a word file from trados-target.txt
-7. translate the word file with deeple (make sure the word file has less than 100,000 characters)
-8. copy the translated text back to trados-target.txt
-9. verify the inconsistencies in trados-target.txt using "perl verify.pl" and fix all errors
-10. inject the target file back using "perl in.pl trados.sdlxliff"
+   C:\Users\Solar\OneDrive\Dokumenty\Studio 2021\Projects
+   C:\Users\janso\PROJECTS\trados-tools
+   
+5. execute perl ex.pl trados.sdlxliff
+6. ... files trados-source and trados-target.txt will be created
+7. create a word file from trados-target.txt
+8. translate the word file with deeple (make sure the word file has less than 100,000 characters)
+9. copy the translated text back to trados-target.txt
+10. verify the inconsistencies in trados-target.txt using "perl verify.pl" and fix all errors
+11. inject the target file back using "perl in.pl trados.sdlxliff"
 
 
 
