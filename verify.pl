@@ -22,6 +22,18 @@ foreach (@targetText) {
     if ($_ =~ /\&\&/g) {
         print "Warning: Double & in: $_";
     }
+    if ($_ =~ /\< g id/g) {
+        print "Warning: Wrong tag start: < g id :  $_";
+    }
+    if ($_ =~ /\<\!g id/g) {
+        print "Warning: Wrong tag start: <!g id :  $_";
+    }
+
+    if ($_ =~ /\.g id/g) {
+        print "Warning: Wrong tag start: .g id :  $_";
+    }
+
+
 }
 
 foreach my $targetTextLine (@targetText) {
