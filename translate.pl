@@ -3,10 +3,13 @@
 # Modules used
 use strict;
 use warnings;
+use JSON::MaybeXS qw(encode_json decode_json is_bool); # functions only
+use Data::Dumper;
 
 my $deeplAuthenticationKey = "a11c47a8-f648-b6bd-be7a-21d3f3255a60:fx";
 
 my $sourceFileName="trados-source.txt";
+#my $sourceFileName="translate.txt";
 my $targetFileName="trados-translated.txt";
 my $translatedText;
 
@@ -29,24 +32,42 @@ foreach my $sourceLine (@tradosSourceFileText) {
     else {
         die "CAN NOT PARSE SOURCE LINE: $sourceLine\n";
     }
-
+    print "------------------------------------------------------------------------------------------\n";
+    print "ID = $sourceID\n";
     $counter++;
+    $sourceText =~ s/\"/\\\"/g;
+    $sourceText =~ s/\&/%26/g;
 
-    my $deeplQuery = "curl -X POST 'https://api-free.deepl.com/v2/translate' -H 'Authorization: DeepL-Auth-Key " . $deeplAuthenticationKey . "' -d 'text=" . $sourceText . "' -d 'target_lang=CS'";
+    my $deeplQuery = "curl -X POST \"https://api-free.deepl.com/v2/translate\" -H \"Authorization: DeepL-Auth-Key " . $deeplAuthenticationKey . "\" -d \"text=" . $sourceText . "\" -d \"target_lang=CS\" -d \"source_lang=EN\"";
     print "QUERY: $deeplQuery\n";
-    my $deeplQueryResponse = system $deeplQuery;
 
-    if ($deeplQueryResponse =~ /\"text\":\"(.*)([^\\])\"$/g) {
+    my $deeplQueryResponse = `$deeplQuery`;
+
+    print "Response: $deeplQueryResponse\n";
+
+
+    if ($deeplQueryResponse =~ /\"text\":\"(.*)([^\\])\"/g) {
+    #if ($deeplQueryResponse =~ /text(.*)([^\\])/g) {
         $translatedText = $1 . $2;
-    }
+        }
     else {
-        die "CAN NOT PARSE TRANSLATED RESPONSE: $deeplQueryResponse\n";
+            die "CAN NOT PARSE TRANSLATED RESPONSE: $deeplQueryResponse\n";
     }
 
-    print FHT "XID=$sourceID:$translatedText";
+    $translatedText =~ s/\\\"/\"/g;
+    $translatedText =~ s/\&\&/\&/g;
+    $translatedText =~ s/\< g id/<g id/g;
+    $translatedText =~ s/\<\.g id/<g id/g;
+    $translatedText =~ s/\<\!g id/<g id/g;
+    $translatedText =~ s/\& apos/\&apos/g;
+    $translatedText =~ s/\& quot/\&quot/g;
+    $translatedText =~ s/\& amp/&amp/g;
+    print "------------------------------------------------------------------------------------------\n";
+    print "Translated:$translatedText\n";
+    print FHT "XID=$sourceID:$translatedText\n";
 
 }
-
+close(FHT);
 
 
 
