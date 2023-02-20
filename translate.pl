@@ -6,7 +6,9 @@ use warnings;
 use JSON::MaybeXS qw(encode_json decode_json is_bool); # functions only
 use Data::Dumper;
 
-my $deeplAuthenticationKey = "a11c47a8-f648-b6bd-be7a-21d3f3255a60:fx";
+#my $deeplAuthenticationKey = "a005c0db-ec48-93bc-67e4-5e863488f34a:fx";    #Honza
+my $deeplAuthenticationKey = "3088df42-2a9b-74d6-3cf6-b1a043ad7abd:fx";     #Adam
+
 
 my $sourceFileName="trados-source.txt";
 #my $sourceFileName="translate.txt";
@@ -60,8 +62,10 @@ foreach my $sourceLine (@tradosSourceFileText) {
     $translatedText =~ s/\<\.g id/<g id/g;
     $translatedText =~ s/\<\!g id/<g id/g;
     $translatedText =~ s/\& apos/\&apos/g;
+    $translatedText =~ s/\&apos /\&apos; /g;
     $translatedText =~ s/\& quot/\&quot/g;
     $translatedText =~ s/\& amp/&amp/g;
+
     print "------------------------------------------------------------------------------------------\n";
     print "Translated:$translatedText\n";
     print FHT "XID=$sourceID:$translatedText\n";
