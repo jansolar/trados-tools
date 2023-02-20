@@ -13,6 +13,20 @@
 11. inject the target file back using "perl in.pl trados.sdlxliff"
 
 
+1. If there are NO already translated texts, with API:
+2. in TRADOS : copy all source to target + save.
+3. copy the sdlxliff file to the trados-tools directory as "trados.sdlxliff"
+   C:\Users\Solar\OneDrive\Dokumenty\Studio 2021\Projects
+   C:\Users\janso\PROJECTS\trados-tools
+
+5. execute perl ex.pl trados.sdlxliff
+6. ... files trados-source and trados-target.txt will be created
+7. execute per translate.pl
+8. ... files trados-translated.txt will be created
+9. copy the trados-translated.txt to trados-target.txt
+10. verify the inconsistencies in trados-target.txt using "perl verify.pl" and fix all errors
+11. inject the target file back using "perl in.pl trados.sdlxliff"
+
 
 1. If there are already some translated texts:
 2. copy the sdlxliff file to the trados-tools directory as "trados.sdlxliff"
