@@ -19,6 +19,12 @@ foreach (@targetText) {
     if ($_ =~ /\& (\w+);/g) {
         print "Error: >>& $1;<< in: $_";
     }
+    if ($_ =~ /\&(\w+)\./g) {
+        print "Error in TAG: >>&$1.<< in: $_";
+    }
+    if ($_ =~ /\&(\w+)[^a-zA-Z;]/g) {
+        print "*** Error in TAG: >>&$1<< in: $_";
+    }
     if ($_ =~ /\&\&/g) {
         print "Warning: Double & in: $_";
     }

@@ -21,7 +21,7 @@
 
 5. execute perl ex.pl trados.sdlxliff
 6. ... files trados-source and trados-target.txt will be created
-7. execute per translate.pl
+7. execute perl translate.pl
 8. ... files trados-translated.txt will be created
 9. copy the trados-translated.txt to trados-target.txt
 10. verify the inconsistencies in trados-target.txt using "perl verify.pl" and fix all errors
